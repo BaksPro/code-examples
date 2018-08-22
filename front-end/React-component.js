@@ -7,34 +7,41 @@ import computersSelector from '../../../../selectors/computer-list';
 import MoveToGroupForm from './MoveToGroupForm';
 import Table from './Table';
 import BulkActions from './BulkActions';
-import {
-    computerChosen,
-    ComputerLoaded,
-    joinComputerListRoom,
-    leaveComputerListRoom,
-    loadActionData,
-    moveToGroup,
-    stopAction,
-} from '../../../../actions/computers';
-import {
-    cleanAndScanIssueSettings,
-    scanBulkIssueSettings,
-} from '../../../../actions/issueSettings';
+import { computerChosen, ComputerLoaded, loadActionData, moveToGroup, stopAction } from '../../../../actions/computers';
+import { cleanAndScanIssueSettings, scanBulkIssueSettings } from '../../../../actions/issueSettings';
 
 class ComputerList extends Component {
     static propTypes = {
-        groups: PropTypes.array,
-        filteredItems: PropTypes.shape({
-            color: PropTypes.string,
-            fontSize: PropTypes.number,
+        groups: PropTypes.shape({
+            createdAt: PropTypes.string,
+            updatedAt: PropTypes.string,
+            id: PropTypes.number,
+            name: PropTypes.string,
+            userId: PropTypes.number,
         }),
-        moveToGroup: PropTypes.func,
+        filteredItems: PropTypes.shape({
+            OsName: PropTypes.string,
+            createdAt: PropTypes.string,
+            updatedAt: PropTypes.string,
+            groupId: PropTypes.number,
+            groupName: PropTypes.string,
+            id: PropTypes.number,
+            isOnline: PropTypes.bool,
+            name: PropTypes.string,
+            pcUser: PropTypes.string,
+            userId: PropTypes.number,
+            wentOffline: PropTypes.string,
+        }),
+        moveToGroup: PropTypes.func.isRequired,
+        cleanAndScanIssueSettings: PropTypes.func.isRequired,
+        scanBulkIssueSettings: PropTypes.func.isRequired,
+        loadActionData: PropTypes.func.isRequired,
+        stopAction: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
         groups: [],
         filteredItems: [],
-        moveToGroup: PropTypes.func,
     };
 
     constructor(props) {
@@ -59,12 +66,8 @@ class ComputerList extends Component {
             return;
         }
 
-        const filteredСheckedAgentList = checkedAgentList.filter(
-            item => !actions.find(action => action.agentId === item.agentId)
-        );
-        const filteredСheckedList = checkedList.filter(
-            item => !actions.find(action => action.computerId === item)
-        );
+        const filteredСheckedAgentList = checkedAgentList.filter(item => !actions.find(action => action.agentId === item.agentId));
+        const filteredСheckedList = checkedList.filter(item => !actions.find(action => action.computerId === item));
 
         this.setState({
             checkedList: filteredСheckedList,
@@ -114,15 +117,7 @@ class ComputerList extends Component {
     }
 
     render() {
-        const {
-            groups,
-            stopAction,
-            cleanAndScanIssueSettings,
-            scanBulkIssueSettings,
-            ComputerLoaded,
-            filteredItems,
-            actions,
-        } = this.props;
+        const { groups, stopAction, cleanAndScanIssueSettings, scanBulkIssueSettings, ComputerLoaded, filteredItems, actions } = this.props;
 
         const { checkedList, checkedAgentList } = this.state;
         return (
@@ -144,40 +139,37 @@ class ComputerList extends Component {
                     <div className="x_content">
                         <table className="table table-striped bdr_strip ticket-table table-computers table-computer-list table-hover">
                             <thead>
-                                <tr>
-                                    <th>Computer name</th>
-                                    <th>PC user</th>
-                                    <th>Computer group</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                    <th>Action progress</th>
-                                </tr>
+                            <tr>
+                                <th>Computer name</th>
+                                <th>PC user</th>
+                                <th>Computer group</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                                <th>Action progress</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <Table
-                                    items={filteredItems}
-                                    onCheck={this.onCheck}
-                                    ComputerLoaded={ComputerLoaded}
-                                    actions={actions}
-                                    stopAction={stopAction}
-                                    checkedList={checkedList}
-                                />
-                                <tr className="dporHover">
-                                    <td className="table-center">
-                                        <BulkActions
-                                            checkedAgentList={checkedAgentList}
-                                            cleanAndScanIssueSettings={cleanAndScanIssueSettings}
-                                            scanBulkIssueSettings={scanBulkIssueSettings}
-                                            checkedList={checkedList}
-                                            groups={groups}
-                                        />
-                                        <MoveToGroupForm
-                                            moveToGroup={this.moveToGroup}
-                                            groups={groups}
-                                        />
-                                    </td>
-                                    <td colSpan="6" className="table-center " />
-                                </tr>
+                            <Table
+                                items={filteredItems}
+                                onCheck={this.onCheck}
+                                ComputerLoaded={ComputerLoaded}
+                                actions={actions}
+                                stopAction={stopAction}
+                                checkedList={checkedList}
+                            />
+                            <tr className="dporHover">
+                                <td className="table-center">
+                                    <BulkActions
+                                        checkedAgentList={checkedAgentList}
+                                        cleanAndScanIssueSettings={cleanAndScanIssueSettings}
+                                        scanBulkIssueSettings={scanBulkIssueSettings}
+                                        checkedList={checkedList}
+                                        groups={groups}
+                                    />
+                                    <MoveToGroupForm moveToGroup={this.moveToGroup} groups={groups} />
+                                </td>
+                                <td colSpan="6" className="table-center " />
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -201,8 +193,6 @@ const mapDispatchToProps = dispatch =>
             scanBulkIssueSettings,
             loadActionData,
             stopAction,
-            leaveComputerListRoom,
-            joinComputerListRoom,
             ComputerLoaded,
             computerChosen,
         },
